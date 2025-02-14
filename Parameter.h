@@ -1,5 +1,6 @@
 #ifndef PARAMETER_H
 #define PARAMETER_H
+#include<Eigen/Dense>
 template<typename Scalar, int Rows, int Cols>
 class Parameter {
 private:
@@ -43,7 +44,7 @@ public:
 
     // 清零梯度
     void zero_grad() {
-       // grad.setZero();
+        grad.setZero();
     }
 };
 
