@@ -9,7 +9,7 @@ private:
 
 public:
     // 构造函数，初始化参数值并将梯度初始化为零矩阵
-    Parameter(const Eigen::Matrix<Scalar, Rows, Cols>& init_value)
+    Parameter(const Eigen::Matrix<Scalar, Rows, Cols>& init_value)//Parmater此时必须是一个左值
         : value(init_value)
          {
             

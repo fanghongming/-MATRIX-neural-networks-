@@ -8,110 +8,331 @@
 #include <iostream>
 #include <Eigen/Dense>
 #include <cmath>
+using namespace std;
+// struct Base
+// {
+//     Base()
+//     {
 
+//     }
+// };
+// struct Derive1
+// {
+//     Derive1
+//     {
+
+//     }
+// };
+// struct Derive2
+// {
+//     Derive2{
+
+//     }
+// };
+// void f(Base a)
+// {
+//     //获取a的实际类型T
+//     T b;
+// }
+// template<typename Scalar>
+// class Module{
+//     public:
+//     virtual Eigen::Matrix <Scalar,Eigen::Dynamic,Eigen::Dynamic>
+//     forward(const Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic,Eigen::Dynamic>&input)=0;
+//     virtual Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>backward(const Eigen::Matrix <Scalar,Eigen::Dynamic,Eigen::Dynamic>&grad_output)=0;
+//    vitrual void update()=0;
+//    virtual void zero_grad()=0;
+// };
+// template<typename Scalar>
+// struct  ReLu:public Module<Scarlar>
+// {
+//     Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dyanmic>forward(const Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>&input)override{
+//         this->input=input;
+//         return input.cwiseMax(0);
+//     }
+//     Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>backward
+//     (const Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>&grad_output)override{
+//         Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>grad_input=input;
+//         grad_input=(input.array()>0).select(grad_output,0);
+//         return grad_input;
+//     }
+//     void update()override{
+
+//     }
+//     void zero_grad()override{
+
+//     }
+//     Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>input;
+// };
+// template<typename Scalar>
+// class Sigmoid:public Module<Scalar>{
+//     public:
+//     Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>forward
+//     (const Eigen::Matrix<Scalar,Eigen::Dyanmic,Eigen::Dynamic>&input)override
+//     {
+//         this->input=input;
+//         return 1/(1+(-input.array()).exp());
+//     }
+//     Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>backward
+//     (const Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>&grad_output)override{
+//         Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>sigmoid=forward(input);
+//         return grad_output.cwiseProduct(sigmoid.cwiseProduct
+//             (Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>::Ones(sigmoid.rows(),sigmoid.cols())-sigmoid));
+//     }
+//     void update()override{
+
+//     }
+//     void zero_grad()override{
+
+//     }
+//     private:
+//     Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>input;
+// };
+// template<typename Scalar,int Rows,int Cols>
+// struct Parameter{
+//     private:
+//     Eigen::Matrix<Scalar,Rows,Cols>value;
+//     Eigen::Matrix<Scalar,Rows,Cols>grad;
+//     public:
+//     Parameter(const Eigen::Matrix<Scalar,Rows,Cols>&init_value)
+//     :value(init_value)
+//     {
+//         grad=Eigen::Matrix<Scalar,Rows,Cols>::Zero(init_value.rows(),init_value.cols());
+//     }
+//     Eigen::Matrix<Scalar,Rows,Cols>&get_value()
+//     {
+//         return value;
+//     }
+//     const Eigen::Matrix<Scalar,Rows,Cols>&get_value()const 
+//     {
+//         return value;
+//     }
+//     const Eigen::Matrix<Scalar,Rows,Cols>&get_grad()const 
+//     {
+//         return grad;
+//     }
+    
+//     void set_grad(const Eigen::Matrix<Scalar,Rows,Cols>&new_grad)
+//     {
+//         grad=new_grad;
+//     }
+//     void zero_grad()
+//     {
+//         grad.setZero();
+//     }
+// };
+// template<typename Scalar,int Rows,int Cols>
+// struct AdamOptimzer:Optimzizer<Scalar,Rows,Cols>
+// {
+//     Scalar learing_rate;
+//     Scalar beta1;
+//     Scalar beta2;
+//     Scalar epsilon;
+//     int timestep;
+//     Eigen::Matrix<Scalar,Rows,Cols>m;
+//     Eigen::Matrix<Scalar,Rows,Cols>v;
+//     AdamOptimizer(Parameter<Scalar,Rows,Cols>&p,
+//         Scalar lr=0.001,
+//         Scalar b1=0.9,Scalar b2=0.999,Scalar eps=1e-8
+//     ):Optimizer<Scalar,Rows,Cols>(p),learing_rate(lr),beta1(b1),beta2(b2),
+//     epsilon(eps),timestep(0)
+//     {
+//         m=Eigen::Matrix<Scalar,Rows,Cols>::Zero(p.get_grad().rows(),p.get_grad().cols());
+//         v=Eigen::Matrix<Scalar,Rows,Cols>::Zero(p.get_grad().rows(),p.get_grad().cols());
+
+//     }
+//     void step()
+//     {
+//         timestep++;
+//         auto &grad=this->parma.get_grad();
+//         auto &value=this->param.get_value();
+//         m=beta1*m+(1-beta1)*grad;
+//         v=beta2*v+(1-beta2)*grad.cwiseProdut(grad);
+
+//         Eigen::Matrix<Salar,Rows,Cols>m_hat=m/(1-std::pow(beta1,timestep));
+//         Eigen::Matrix<Scalar,Rows,Cols>v_hat=v/(1-std::pow(beta2,timestep));
+
+//         Eigen::Matrix<Scalar,Rows,Cols>epsilon_matrix(v_hat.rows(),v_hat.cols())
+//        for(int i=0;i<v_hat.rows();i++)
+//        {
+//         for(int j=0;j<v_hat.cols();j++)
+//         {
+//             epsilon_matrix(i,j)=epsilon;
+//         }
+//        }
+//        value-=learing_rate*m_hat.cwiseQuotient(v_hat.cwiseSqrt()+epsilon_matrix);
+//     }
+// };
+// template<typename Scalar>
+// class LinearLayer:public Module<Scalar>
+// {
+//     public:
+//     Parameter<Scalar,Eigen::Dynamic,Eigen::Dynamic>weight;
+//     Parameter<Scalar,1,Eigen::Dynamic>bias;
+//     AdamOptimizer<Scalar,Eigen::Dynamic,Eigen::Dynamic>weight_optimizer;
+//     AdamOptimizer<Scalar,1,Eigen::Dynamic>bias_optimizer;
+//     LinearLayer(int in_features,int out_features)
+//     :weight(Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>::Random(in_features,out_features))
+//     ,bias(Eigen::Matrix<Scalar,1,Eigen::Dynamic>::Random(1,out_features)),
+//     weight_optimzer(weight),
+//     bias_optimzer(bias)
+//     {
+
+//     }
+//     Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>forward
+//     (const Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>&input)override
+//     {
+//         this->input=input;
+//         return input*weight.get_value()+bias.get_value();
+//     }
+//     Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>backward
+//     (const Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>&grad_output)override
+//     {
+//         weight.set_grad(weight_grad);
+//         Eigen::Marix<Scalar,1,Eigen::Dynamic>bias_grad=grad_output;
+//         bias.set_grad(bias_grad);
+//         Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>grad_input
+//         =grad_output*weight.get_value().transpose();
+//         return grad_input;
+//     }
+//     void update()override{
+//         weight_optimzer.step();
+//         bias_optimizer.step();
+//     }
+
+//     void zero_grad()override{
+//         weight.zero_grad();
+//         bias.zero_grad();
+//     }
+//     private:
+//     Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>input;
+// };
+// template<typename Scalar>
+// struct loss
+// {
+//     virtual Scalar forward(const Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>&prediciton,
+//         const Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>&target)=0;
+//     virtual Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>backward(const Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>&prediction,
+//     const Eigen::Matrix<Sclar,Eigen::Dynamic,Eigen::Dynamic>&target)=0;
+    
+// };
+// template<typename Scalar>
+// struct MSELoss:publci Loss<Scalar>{
+//     Scalar forward(const Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic&prediction,
+//     const Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>&target
+//     )override{
+//         return (prediction-target).array().square().mean();
+//     }
+//     Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>copy_backward(const Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>&prediciton,
+//         const Eigen::Matrix<Sclar,Eigen::Dynamic,Eigen::Dynamic>&target)override
+//         {
+//             return 2*(prediction-target)/prediction.size();
+//         }
+
+// };
 //定义 sigmoid 激活函数
-Eigen::MatrixXd sigmoid(const Eigen::MatrixXd& x) {
-    return 1.0 / (1.0 + (-x).array().exp());
-}
+// Eigen::MatrixXd sigmoid(const Eigen::MatrixXd& x) {
+//     return 1.0 / (1.0 + (-x).array().exp());
+// }
 
-// 定义 sigmoid 激活函数的导数
-Eigen::MatrixXd sigmoid_derivative(const Eigen::MatrixXd& x) {
-    return x.array() * (1 - x.array());
-}
+// // 定义 sigmoid 激活函数的导数
+// Eigen::MatrixXd sigmoid_derivative(const Eigen::MatrixXd& x) {
+//     return x.array() * (1 - x.array());
+// }
 
-// 神经网络类
-class NeuralNetwork {
-private:
-    int input_size;
-    int hidden_size;
-    int output_size;
-    Eigen::MatrixXd weights_ih;  // 输入层到隐藏层的权重
-    Eigen::MatrixXd weights_ho;  // 隐藏层到输出层的权重
-    Eigen::VectorXd bias_h;      // 隐藏层的偏置
-    Eigen::VectorXd bias_o;      // 输出层的偏置
+// // 神经网络类
+// class NeuralNetwork {
+// private:
+//     int input_size;
+//     int hidden_size;
+//     int output_size;
+//     Eigen::MatrixXd weights_ih;  // 输入层到隐藏层的权重
+//     Eigen::MatrixXd weights_ho;  // 隐藏层到输出层的权重
+//     Eigen::VectorXd bias_h;      // 隐藏层的偏置
+//     Eigen::VectorXd bias_o;      // 输出层的偏置
 
-public:
-    // 构造函数，初始化网络参数
-    NeuralNetwork(int input_size, int hidden_size, int output_size)
-        : input_size(input_size), hidden_size(hidden_size), output_size(output_size) {
-        // 随机初始化权重和偏置
-        weights_ih = Eigen::MatrixXd::Random(hidden_size, input_size);
-        weights_ho = Eigen::MatrixXd::Random(output_size, hidden_size);
-        bias_h = Eigen::VectorXd::Random(hidden_size);
-        bias_o = Eigen::VectorXd::Random(output_size);
-    }
+// public:
+//     // 构造函数，初始化网络参数
+//     NeuralNetwork(int input_size, int hidden_size, int output_size)
+//         : input_size(input_size), hidden_size(hidden_size), output_size(output_size) {
+//         // 随机初始化权重和偏置
+//         weights_ih = Eigen::MatrixXd::Random(hidden_size, input_size);
+//         weights_ho = Eigen::MatrixXd::Random(output_size, hidden_size);
+//         bias_h = Eigen::VectorXd::Random(hidden_size);
+//         bias_o = Eigen::VectorXd::Random(output_size);
+//     }
 
-    // 前向传播
-    Eigen::MatrixXd feedforward(const Eigen::MatrixXd& input) {
-        // 计算隐藏层的输入
-        Eigen::MatrixXd hidden_input = weights_ih * input + bias_h.replicate(1, input.cols());
-        // 应用 sigmoid 激活函数
-        Eigen::MatrixXd hidden_output = sigmoid(hidden_input);
+//     // 前向传播
+//     Eigen::MatrixXd feedforward(const Eigen::MatrixXd& input) {
+//         // 计算隐藏层的输入
+//         Eigen::MatrixXd hidden_input = weights_ih * input + bias_h.replicate(1, input.cols());
+//         // 应用 sigmoid 激活函数
+//         Eigen::MatrixXd hidden_output = sigmoid(hidden_input);
 
-        // 计算输出层的输入
-        Eigen::MatrixXd output_input = weights_ho * hidden_output + bias_o.replicate(1, hidden_output.cols());
-        // 应用 sigmoid 激活函数
-        Eigen::MatrixXd output = sigmoid(output_input);
+//         // 计算输出层的输入
+//         Eigen::MatrixXd output_input = weights_ho * hidden_output + bias_o.replicate(1, hidden_output.cols());
+//         // 应用 sigmoid 激活函数
+//         Eigen::MatrixXd output = sigmoid(output_input);
 
-        return output;
-    }
+//         return output;
+//     }
 
-    // 训练函数
-    void train(const Eigen::MatrixXd& input, const Eigen::MatrixXd& target, double learning_rate) {
-        // 前向传播
-        Eigen::MatrixXd hidden_input = weights_ih * input + bias_h.replicate(1, input.cols());
-        Eigen::MatrixXd hidden_output = sigmoid(hidden_input);
+//     // 训练函数
+//     void train(const Eigen::MatrixXd& input, const Eigen::MatrixXd& target, double learning_rate) {
+//         // 前向传播
+//         Eigen::MatrixXd hidden_input = weights_ih * input + bias_h.replicate(1, input.cols());
+//         Eigen::MatrixXd hidden_output = sigmoid(hidden_input);
 
-        Eigen::MatrixXd output_input = weights_ho * hidden_output + bias_o.replicate(1, hidden_output.cols());
-        Eigen::MatrixXd output = sigmoid(output_input);
+//         Eigen::MatrixXd output_input = weights_ho * hidden_output + bias_o.replicate(1, hidden_output.cols());
+//         Eigen::MatrixXd output = sigmoid(output_input);
 
-        // 计算输出层的误差
-        Eigen::MatrixXd output_error = target - output;
-        // 计算输出层的梯度
-        Eigen::MatrixXd output_gradient = output_error.array() * sigmoid_derivative(output).array();
-        output_gradient *= learning_rate;
+//         // 计算输出层的误差
+//         Eigen::MatrixXd output_error = target - output;
+//         // 计算输出层的梯度
+//         Eigen::MatrixXd output_gradient = output_error.array() * sigmoid_derivative(output).array();
+//         output_gradient *= learning_rate;
 
-        // 计算隐藏层的误差
-        Eigen::MatrixXd hidden_error = weights_ho.transpose() * output_gradient;
-        // 计算隐藏层的梯度
-        Eigen::MatrixXd hidden_gradient = hidden_error.array() * sigmoid_derivative(hidden_output).array();
-        hidden_gradient *= learning_rate;
+//         // 计算隐藏层的误差
+//         Eigen::MatrixXd hidden_error = weights_ho.transpose() * output_gradient;
+//         // 计算隐藏层的梯度
+//         Eigen::MatrixXd hidden_gradient = hidden_error.array() * sigmoid_derivative(hidden_output).array();
+//         hidden_gradient *= learning_rate;
 
-        // 更新权重和偏置
-        weights_ho += output_gradient * hidden_output.transpose();
-        bias_o += output_gradient.rowwise().sum();
+//         // 更新权重和偏置
+//         weights_ho += output_gradient * hidden_output.transpose();
+//         bias_o += output_gradient.rowwise().sum();
 
-        weights_ih += hidden_gradient * input.transpose();
-        bias_h += hidden_gradient.rowwise().sum();
-    }
-};
+//         weights_ih += hidden_gradient * input.transpose();
+//         bias_h += hidden_gradient.rowwise().sum();
+//     }
+// };
 
-int main() {
-    // 定义网络结构
-    int input_size = 2;
-    int hidden_size = 3;
-    int output_size = 1;
+// int main() {
+//     // 定义网络结构
+//     int input_size = 2;
+//     int hidden_size = 3;
+//     int output_size = 1;
 
-    // 创建神经网络对象
-    NeuralNetwork nn(input_size, hidden_size, output_size);
+//     // 创建神经网络对象
+//     NeuralNetwork nn(input_size, hidden_size, output_size);
 
-    // 随机生成训练数据
-    Eigen::MatrixXd input = Eigen::MatrixXd::Random(input_size, 10);
-    Eigen::MatrixXd target = Eigen::MatrixXd::Random(output_size, 10);
+//     // 随机生成训练数据
+//     Eigen::MatrixXd input = Eigen::MatrixXd::Random(input_size, 10);
+//     Eigen::MatrixXd target = Eigen::MatrixXd::Random(output_size, 10);
 
-    // 训练网络
-    double learning_rate = 0.1;
-    int epochs = 1000;
-    for (int i = 0; i < epochs; ++i) {
-        nn.train(input, target, learning_rate);
-    }
+//     // 训练网络
+//     double learning_rate = 0.1;
+//     int epochs = 1000;
+//     for (int i = 0; i < epochs; ++i) {
+//         nn.train(input, target, learning_rate);
+//     }
 
-    // 进行预测
-    Eigen::MatrixXd prediction = nn.feedforward(input);
-    std::cout << "Prediction:\n" << prediction << std::endl;
+//     // 进行预测
+//     Eigen::MatrixXd prediction = nn.feedforward(input);
+//     std::cout << "Prediction:\n" << prediction << std::endl;
 
-    return 0;
-}
+//     return 0;
+// }
 // #include"AdamOptimizer.h"
 // #include"Parameter.h"
 // #include "LinearLayer.h"

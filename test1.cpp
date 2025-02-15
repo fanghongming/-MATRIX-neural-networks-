@@ -4,65 +4,32 @@
 #include "LinearLayer.h"
 #include "Parameter.h"
 #include "AdamOptimizer.h"
-#include "MSELoss.h"
+#include "Loss.h"
 #include "Activation.h"
 #include "NeuralNetwork.h"
+#include "ModelIO.h"
 using namespace std;
 
-// template<typename Scalar>
-// class NeuralNetwork : public Module<Scalar> {
-// public:
-//     void add_module(std::shared_ptr<Module<Scalar>> module) {
-//         modules.push_back(module);
-//     }
-
-//     Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> forward(const Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>& input) override {
-//         Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> output = input;
-//         for (auto& module : modules) {
-//             output = module->forward(output);
-//         }
-//         return output;
-//     }
-
-//     Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> backward(const Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>& grad_output) override {
-//         Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> grad = grad_output;
-//         for (auto it = modules.rbegin(); it != modules.rend(); ++it) {
-//             grad = (*it)->backward(grad);
-//         }
-//         return grad;
-//     }
-
-//     void update() override {
-//         for (auto& module : modules) {
-//             module->update();
-//         }
-//     }
-
-//     void zero_grad() override {
-//         for (auto& module : modules) {
-//             module->zero_grad();
-//         }
-//     }
-
-// private:
-//     std::vector<std::shared_ptr<Module<Scalar>>> modules;
-// };
-// //注意传入的是行向量，输出的也是行向量！
-// //target也必须是行向量
 signed main() {
     // XOR 数据集
    
-
+    // fstream file("ccc.out",std::ios::in|std::ios::out|std::ios::trunc);
+    // file<<100<<"\n";
+    //fstream file("ccc.out",std::ios::in|std::ios::out|std::ios::trunc);
     // 创建神经网络
     NeuralNetwork<double> network;
-    network.add_module(make_shared<LinearLayer<double>>(2, 4)); // 输入层到隐藏层
+   
+   
+    
+   // auto bias_optimizer=std::make_shared<AdamOptimizer<double,1,Eigen::Dynamic>>(Eigen::Matrix<double,1,Eigen::Dynamic>::Zero(1,4));
+   network.add_module(make_shared<LinearLayer<double>>(2, 4)); // 输入层到隐藏层
     network.add_module(make_shared<ReLU<double>>());
-    network.add_module(make_shared<LinearLayer<double>>(4, 1)); // 隐藏层到输出层
+    network.add_module(make_shared<LinearLayer<double>>(4, 1));// 隐藏层到输出层
     network.add_module(make_shared<Sigmoid<double>>());
-
+    load_model(network,"canshu.in");
     MSELoss<double> loss;
 
-    const int epochs = 10000;
+    const int epochs = 0;
     const double learning_rate = 0.1;
     Eigen::MatrixXd input(1,2);//输出是行向量，出入还是行向量。
     Eigen::MatrixXd target(1,1);
@@ -123,11 +90,52 @@ signed main() {
         }
     }
 
-    // auto final_prediction = network.forward(input);
-    // cout << "Final Prediction: \n" << final_prediction << endl;
-
+    auto final_prediction = network.forward(input);
+    cout << "Final Prediction: \n" << final_prediction << endl;
+    save_model(network,"canshu.in");
     return 0;
 }
+// template<typename Scalar>
+// class NeuralNetwork : public Module<Scalar> {
+// public:
+//     void add_module(std::shared_ptr<Module<Scalar>> module) {
+//         modules.push_back(module);
+//     }
+
+//     Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> forward(const Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>& input) override {
+//         Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> output = input;
+//         for (auto& module : modules) {
+//             output = module->forward(output);
+//         }
+//         return output;
+//     }
+
+//     Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> backward(const Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>& grad_output) override {
+//         Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> grad = grad_output;
+//         for (auto it = modules.rbegin(); it != modules.rend(); ++it) {
+//             grad = (*it)->backward(grad);
+//         }
+//         return grad;
+//     }
+
+//     void update() override {
+//         for (auto& module : modules) {
+//             module->update();
+//         }
+//     }
+
+//     void zero_grad() override {
+//         for (auto& module : modules) {
+//             module->zero_grad();
+//         }
+//     }
+
+// private:
+//     std::vector<std::shared_ptr<Module<Scalar>>> modules;
+// };
+// //注意传入的是行向量，输出的也是行向量！
+// //target也必须是行向量
+
 // template<typename Scalar>
 // class NeuralNetwork : public Module<Scalar> {
 // public:

@@ -35,7 +35,11 @@ public:
             module->zero_grad();
         }
     }
-
+    std::vector<std::shared_ptr<Module<Scalar>>>&get_modules()
+    {
+        return modules;
+    }
+    
 private:
     std::vector<std::shared_ptr<Module<Scalar>>> modules;
 };
