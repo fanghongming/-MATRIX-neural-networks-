@@ -233,3 +233,219 @@ int main() {
 
 所以，随机梯度下降的应用场景主要是在梯度计算困难或计算成本过高的情况下，但并不意味着梯度一定不能用公式求解。它是一种为了更高效地进行模型训练而采用的优化算法，通过对梯度的近似估计来快速找到目标函数的最优解或近似最优解。
 
+# 福兮祸之所倚，祸兮福之所伏
+
+反向传播算法是应用在前馈神经网络，它的目的是训练一个人工神经网络，这个基于仿生学的一种算法，但是更是基于数学的。
+
+BP算法最重要的关键，也就是比较难以理解的地方，就是公式的多样性和参数的多样性。
+
+但是实际上只是应用到基础的知识。
+![](https://files.mdnice.com/user/72186/9a7baa85-7b4a-4419-adf7-1fc215effafe.png)
+
+感觉这门学科正在变成一个经验科学，类似生物，化学，当然，其可解释性还需要去研究。
+
+神经网络是一个非常大的函数，这个函数返回一些值，当然不一定是正确的，但是你可以调。
+
+ 我们先规定一些变量。
+![](https://files.mdnice.com/user/72186/dc0f4e34-e857-4d93-afe7-a4ebfaa4e2e8.png)
+
+
+希望大家脑子里神经网络能看懂这个东西 .
+
+
+设总层数(包括输入输出和隐含)为d,输入层的大小为$sz_1$,输出层的大小为$sz_d$
+我们想要求解误差，我们一般不直接用一次方误差，因为比较难算（笔者的高中数学老师告诉，大概意思是如果求解一次方，那么我们就必须要求解绝对值，难算，还有更深的原因，就是平方是光滑的，所以高中讲最小二乘法。）
+
+对一每次训练，我们定义最终神经网络的输出为$\vec{y'}=(y_1',y_2',...,y_{sz_d}')$
+
+这就是其中
+
+$$\begin{align*}
+&设\sigma(x)=\frac{1}{1+e^{-x}}
+\\&我们希望求解\arg _{w}E_k=\frac{1}{2}  \sum_{i=1}^{sz_{d}}((\sigma(\sum_{j=1}^{sz_{d-1}}w^{d-1}_{ji}\times a^{d-1}+b_{i}^d))-y_j)^2
+
+\end{align*}$$
+
+总体公式的展开就是如此，我们不妨压缩公式，分层次。
+
+我们设
+
+$$z_i^d=\beta_{i}^d+b_{i}^d$$
+
+$$\beta_i^d=\sum_{j=1}^{sz_{d-1}}w_{ji}^{d-1}a_{j}^{d-1}$$
+$$f_j^d=\sigma _{}(z_i^d)-y_i$$
+我们的公式可以压缩成
+
+$$arg_w\sum_{i=1}^{sz_d}(f_j^d)^2$$
+
+根据梯度下降算法，我们想要找的就是$w和b$的梯度，于是我们固定某些值，这些值就是$\vec{y}$，就像求解高中题一样固定某个函数中的参数，因为你有理由认为这个y就是正确的经验。 
+
+如果按照《高等数学》的教法，那么就是求出某个数的梯度，梯度的解就是根据偏导数。
+求
+全面考虑各个维度上的共吸纳，各个参数给出的贡献，就是偏导数想要告诉我们的。
+
+如果只是二维的空间的导数，不全面。
+
+容易看到如下公式
+$$\frac{\partial E}{\partial w_{ik}^d}=\frac{\partial E}{\partial f_j^d}\frac{\partial f_j^d}{\partial z_i^d }\frac{ \partial z_i^d }{\partial w_{ik}^d}$$
+
+当然也不容易看到。当然，一般高等数学课程都会教一些内容，比如宋浩老师啊，或者你的数学老师。
+
+![](https://files.mdnice.com/user/72186/d61d32ea-729a-4966-a432-6f5d50cf4b84.png)
+
+其中
+$$\frac{\partial E}{\partial f_j^d}=f_j^d$$
+我们将对$\frac{1}{1+e^{-x}}$求导，我们发现
+
+$$(\frac{1}{1+e^{-x}})'=-\frac{1}{(1+e^{-x})^2}(e^{-x})$$
+
+
+
+
+$$=-\frac{e^{-x}}{(1+e^{-x})^2}=\frac{1+e^{-x}-1}{(1+e^{-x})^2}$$
+$$=\sigma(x)(1-\sigma(x))$$
+$$\frac{\partial f_j^d}{\partial z_i^d} =\sigma (z_i^d)(1-\sigma (z_i^d))$$
+
+$$\frac{z_i^d}{\partial w_{ik}^d}=a_i^{d-1}$$
+
+然后，我们讲所有东西带入，就求出了关于这个函数在$w_i$上的梯度。
+
+$$\frac{\partial E}{\partial b_d^i}=\frac{\partial E}{\partial f_j^d}\frac{\partial f_j^d}{\partial z_i^d }\frac{ \partial z_i^d }{\partial b_d^i}$$
+
+很容易看到$\frac{ \partial z_i^d }{\partial b_d^i}=1$
+
+那么还有一个求导就是
+
+$$\frac{\partial E}{\partial a_{i}^d}$$
+
+这个稍微有点复杂，因为这是唯一需要和式的，也就是我们可以看这元素的多次出现。
+![](https://files.mdnice.com/user/72186/4b306844-ec9e-4cce-9fcb-3767208441a6.png)
+
+$$\frac{\partial E}{\partial a_i^{d-1}}=\sum_{j=1}^{sz_d}\frac{\partial E}{\partial f_{j}^d}\frac{\partial f_j^d}{\partial z_j^d}\frac{\partial z_j^d}{\partial a_{i}^{d-1}}$$
+其中
+$$\frac{\partial z_j^d}{\partial a_{i}^{d-1}}=w_{ij}^d$$
+
+有了这个值，我们就可以向前递归出前面的值！
+
+ $$\frac{\partial E}{\partial w_{ij}^{d-2}}=\frac{\partial E}{\partial a_{j}^{d-1}}\frac{\partial a_j^{d-1}}{\partial w_{ij}^{d-2}}$$
+其中$\frac{\partial E}{\partial a_{j}^{d-1}}$已经求解出来了，$\frac{\partial a_j^{d-1}}{\partial w_{ij}^{d-2}}=a_i^{d-2}$
+ $$\frac{\partial E}{\partial b_{i}^{d-2}}=\frac{\partial E}{\partial a_{j}^{d-1}}\frac{\partial a_j^{d-1}}{\partial b_i^{d-2}}$$
+ 
+ 对于$\frac{\partial E}{\partial a_{i}^{d-2}}$,因为$a_{i}^{d-2}$能影响很多变量，所以
+ 
+ $$\frac{\partial E}{\partial a_{i}^{d-2}}=\sum_{j=1}^{sz_{d-1}}\frac{\partial E}{\partial a_j^{d-1}}\frac{\partial a_j^{d-1}}{\partial z_j^{d-2}}\frac{\partial z_j^{d-2}}{\partial a_i^{d-2}}$$
+ 
+其中$\frac{\partial  a_j^{d-1}}{\partial z_j^{d-1}}=\sigma (z_j^{d-1})(1-\sigma (z_j^{d-1})$,$\frac{\partial z_j^{d-1}}{\partial a_i^{d-2}}=w_{ij}^{d-2}$
+ 
+实际上就是动态规划的思想，递归的思想。
+
+顺便放上代码，我们使用的库就是eigen。
+``` cpp
+#include <iostream>
+#include <Eigen/Dense>
+#include <cmath>
+
+// 定义 sigmoid 激活函数
+Eigen::MatrixXd sigmoid(const Eigen::MatrixXd& x) {
+    return 1.0 / (1.0 + (-x).array().exp());
+}
+
+// 定义 sigmoid 激活函数的导数
+Eigen::MatrixXd sigmoid_derivative(const Eigen::MatrixXd& x) {
+    return x.array() * (1 - x.array());
+}
+
+// 神经网络类
+class NeuralNetwork {
+private:
+    int input_size;
+    int hidden_size;
+    int output_size;
+    Eigen::MatrixXd weights_ih;  // 输入层到隐藏层的权重
+    Eigen::MatrixXd weights_ho;  // 隐藏层到输出层的权重
+    Eigen::VectorXd bias_h;      // 隐藏层的偏置
+    Eigen::VectorXd bias_o;      // 输出层的偏置
+
+public:
+    // 构造函数，初始化网络参数
+    NeuralNetwork(int input_size, int hidden_size, int output_size)
+        : input_size(input_size), hidden_size(hidden_size), output_size(output_size) {
+        // 随机初始化权重和偏置
+        weights_ih = Eigen::MatrixXd::Random(hidden_size, input_size);
+        weights_ho = Eigen::MatrixXd::Random(output_size, hidden_size);
+        bias_h = Eigen::VectorXd::Random(hidden_size);
+        bias_o = Eigen::VectorXd::Random(output_size);
+    }
+
+    // 前向传播
+    Eigen::MatrixXd feedforward(const Eigen::MatrixXd& input) {
+        // 计算隐藏层的输入
+        Eigen::MatrixXd hidden_input = weights_ih * input + bias_h.replicate(1, input.cols());
+        // 应用 sigmoid 激活函数
+        Eigen::MatrixXd hidden_output = sigmoid(hidden_input);
+
+        // 计算输出层的输入
+        Eigen::MatrixXd output_input = weights_ho * hidden_output + bias_o.replicate(1, hidden_output.cols());
+        // 应用 sigmoid 激活函数
+        Eigen::MatrixXd output = sigmoid(output_input);
+
+        return output;
+    }
+
+    // 训练函数
+    void train(const Eigen::MatrixXd& input, const Eigen::MatrixXd& target, double learning_rate) {
+        // 前向传播
+        Eigen::MatrixXd hidden_input = weights_ih * input + bias_h.replicate(1, input.cols());
+        Eigen::MatrixXd hidden_output = sigmoid(hidden_input);
+
+        Eigen::MatrixXd output_input = weights_ho * hidden_output + bias_o.replicate(1, hidden_output.cols());
+        Eigen::MatrixXd output = sigmoid(output_input);
+
+        // 计算输出层的误差
+        Eigen::MatrixXd output_error = target - output;
+        // 计算输出层的梯度
+        Eigen::MatrixXd output_gradient = output_error.array() * sigmoid_derivative(output).array();
+        output_gradient *= learning_rate;
+
+        // 计算隐藏层的误差
+        Eigen::MatrixXd hidden_error = weights_ho.transpose() * output_gradient;
+        // 计算隐藏层的梯度
+        Eigen::MatrixXd hidden_gradient = hidden_error.array() * sigmoid_derivative(hidden_output).array();
+        hidden_gradient *= learning_rate;
+
+        // 更新权重和偏置
+        weights_ho += output_gradient * hidden_output.transpose();
+        bias_o += output_gradient.rowwise().sum();
+
+        weights_ih += hidden_gradient * input.transpose();
+        bias_h += hidden_gradient.rowwise().sum();
+    }
+};
+
+int main() {
+    // 定义网络结构
+    int input_size = 2;
+    int hidden_size = 3;
+    int output_size = 1;
+
+    // 创建神经网络对象
+    NeuralNetwork nn(input_size, hidden_size, output_size);
+
+    // 随机生成训练数据
+    Eigen::MatrixXd input = Eigen::MatrixXd::Random(input_size, 10);
+    Eigen::MatrixXd target = Eigen::MatrixXd::Random(output_size, 10);
+
+    // 训练网络
+    double learning_rate = 0.1;
+    int epochs = 1000;
+    for (int i = 0; i < epochs; ++i) {
+        nn.train(input, target, learning_rate);
+    }
+
+    // 进行预测
+    Eigen::MatrixXd prediction = nn.feedforward(input);
+    std::cout << "Prediction:\n" << prediction << std::endl;
+
+    return 0;
+}
+```
