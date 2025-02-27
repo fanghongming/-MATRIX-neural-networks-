@@ -39,6 +39,12 @@ public:
     {
         return modules;
     }
+    void set_training(bool training)override{
+        for(auto &module:modules)
+        {
+            module->set_training(training);
+        }
+    }
     
 private:
     std::vector<std::shared_ptr<Module<Scalar>>> modules;

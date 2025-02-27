@@ -21,6 +21,10 @@ public:
     {
 
     }
+    virtual void set_training(bool training)
+    {
+
+    }
 };
 
 #endif // MODULE_H
