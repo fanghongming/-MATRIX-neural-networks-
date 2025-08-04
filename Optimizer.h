@@ -1,16 +1,25 @@
 #ifndef OPTIMIZER_H
 #define OPTIMIZER_H
 #include "Parameter.h"
+
+struct OptimizerBase {
+    virtual void step() = 0;
+    virtual ~OptimizerBase() = default;
+};
+
 template <typename Scalar,int Rows,int Cols>
-struct  Optimizer
+struct  Optimizer:public OptimizerBase
 {
     Parameter<Scalar,Rows,Cols>&param;
+    //param本身处理的就是引用。
     Optimizer(Parameter<Scalar,Rows,Cols>&p):param(p)
     {
         
     }
     virtual void step()=0;
 };
+
+
 template<typename Scalar, int Rows, int Cols>
 struct AdamOptimizer :Optimizer <Scalar,Rows,Cols> {
 
@@ -49,6 +58,7 @@ struct AdamOptimizer :Optimizer <Scalar,Rows,Cols> {
         // 将epsilon转换为矩阵
         //Eigen::Matrix<Scalar, Rows, Cols> epsilon_matrix = Eigen::Matrix<Scalar, Rows, Cols>::Constant(epsilon);
         Eigen::Matrix<Scalar,Rows,Cols>epsilon_matrix(v_hat.rows(),v_hat.cols());
+        
         for(int i=0;i<v_hat.rows();i++)
         {
             for(int j=0;j<v_hat.cols();j++)

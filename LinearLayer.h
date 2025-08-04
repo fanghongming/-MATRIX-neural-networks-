@@ -1,10 +1,11 @@
 #ifndef LINEARLAYER_H
 #define LINEARLAYER_H
-
+#include "iostream"
 #include "Module.h"
 #include "Parameter.h"
 #include "AdamOptimizer.h"
 #include <fstream>
+//行向量是一个样本。
 //如果完全在内部操作，使用模板，否则，有一部分在外部操作，使用指针，或者引用
 template<typename Scalar,typename Optimizer_w=AdamOptimizer<double,Eigen::Dynamic,Eigen::Dynamic>,typename Optimizer_b=AdamOptimizer<double,1,Eigen::Dynamic>>
 class LinearLayer : public Module<Scalar> {
@@ -23,6 +24,20 @@ public:
     Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> forward
     (const Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>& input) override {
         this->input = input;
+        if(input.cols()!=weight.get_value().rows())
+        {
+            throw "in the LinearLayer,this is a problem for matrix mul";
+        }
+       // std::cout<<input.rows()<<" "<<input.cols()<<" "<<weight.get_value().rows()<<" "<<weight.get_value().cols()<<" "<<bias.get_value().rows()<<" "<<bias.get_value().cols()<<"\n";
+        //这边只能处理一个input，也就是input的实际值必须是1行在这里。
+        if(bias.get_value().rows()!=input.rows())
+        {
+            throw "in the LinearLayer,this is a problem for matrix mul or add ";
+        }
+        if(weight.get_value().cols()!=bias.get_value().cols())
+        {
+            throw "in the LinearLayer,this is a problem for matrix mul or add";
+        }
         return input * weight.get_value() + bias.get_value();
     }
 
@@ -30,6 +45,7 @@ public:
     (const Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>& grad_output) override {
         Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> weight_grad = input.transpose() * grad_output;
         weight.set_grad(weight_grad);
+        //因为weight_optimizer中传递的是引用，weight也是更新了。
 
         Eigen::Matrix<Scalar, 1, Eigen::Dynamic> bias_grad = grad_output;
         bias.set_grad(bias_grad);
