@@ -9,7 +9,22 @@
 #include "Loss.h"
 #include "Activation.h"
 #include "Optimizer.h"
+#include "ModelIO.h"
+#include <iostream>
+#include <vector>
 
+
+#include <iostream>
+#include <Eigen/Dense>
+#include <cmath>
+#include <cassert>
+#include "NeuralNetwork.h"
+#include "LinearLayer.h"
+#include "Activation.h"  // 假设包含ReLU、Sigmoid等激活函数
+#include "Loss.h"
+#include "ModelIO.h"     // 包含save_model和load_model函数
+
+//浮点数比较辅助函数（处理精度问题）
 int main() 
 {
     // 生成示例数据（二分类问题）
@@ -25,24 +40,32 @@ int main()
         std::cout << "SVM准确率: " << model1->score(X, y) << std::endl;
     // 在 main.cpp 中
         Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>Y(100,1);
-
         for(int i=0;i<100;i++)
         {
             Y(i,0)=X(i,0)+X(i,1);
         }
     auto nn = new NeuralNetwork<double>();
+    auto nn2=new NeuralNetwork<double>();
     // 添加含权重的线性层（输入2维，输出10维）
-    nn->add_module(std::make_shared<LinearLayer<double>>(2, 10));  
-    nn->add_module(std::make_shared<ReLU<double>>());
-    nn->add_module(std::make_shared<LinearLayer<double>>(10, 1));
+    nn->add_module(std::make_shared<LinearLayer<double>>(2,10));  
+    nn2->add_module(std::make_shared<LinearLayer<double>>(2,10));
 
+    nn->add_module(std::make_shared<ReLU<double>>());
+    nn2->add_module(std::make_shared<ReLU<double>>());
+    
+    nn->add_module(std::make_shared<LinearLayer<double>>(10,1));
+    nn2->add_module(std::make_shared<LinearLayer<double>>(10,1));
 // 直接创建一个与第一个LinearLayer的weight维度匹配的Parameter
 // 假设第一个LinearLayer的weight是 2x10 矩阵（in_features=2, out_features=10）
 //Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> dummy_weight = Eigen::MatrixXd::Random(2, 10);
 //auto param = std::make_shared<Parameter<double, Eigen::Dynamic, Eigen::Dynamic>>(dummy_weight);
 
 // 将该Parameter传入AdamOptimizer
+
     nn->set_loss(
+        std::make_shared<MSELoss<double>>()
+    );
+    nn2->set_loss(
         std::make_shared<MSELoss<double>>()
     );
     // // 2. 神经网络模型
@@ -55,10 +78,14 @@ int main()
     //     std::make_shared<AdamOptimizer<double,Eigen::Dynamic,Eigen::Dynamic>>()  // 假设已实现优化器基类
     // );
     nn->set_max_iter(200);
+    nn2->set_max_iter(200);
       // 多态：用基类指针指向子类
     nn->fit(X, Y);
     //std::cout << "神经网络准确率: " << model2->score(X, y) << std::endl;
-    auto ans=nn->predict(X);
+    nn->save("a.w");
+    nn2->load("a.w");
+    auto ans=nn2->predict(X);
+    //auto ans=nn->predict(X);
     std::cout<<Y.rows()<<" "<<Y.cols()<<" "<<ans.rows()<<" "<<ans.cols()<<"\n";
      for(int i=0;i<100;i++)
      {

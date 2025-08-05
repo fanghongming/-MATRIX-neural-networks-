@@ -202,7 +202,44 @@ public:
     void set_training(bool training) override {
         for (auto& module : modules) module->set_training(training);
     }
+    void save(const std::string&filename)const 
+    {
+        std::fstream file(filename,std::ios::out|std::ios::trunc);
+        if(!file.is_open())
+        {
+            throw std::runtime_error("无法打开文件用于保存模型"+filename);
+        }
+        size_t num_modules=modules.size();
 
+        file<<num_modules<<"\n";
+
+        for(const auto &module:modules)
+        {
+            module->save(file);
+        }
+        file.close();
+    }
+    void load(const std::string&filename)
+    {
+        std::fstream file(filename,std::ios::in);
+
+        if(!file.is_open())
+        {
+            throw std::runtime_error("无法打开文件用于加载模型"+filename);
+        }
+        size_t num_modules;
+        file>>num_modules;
+        if(num_modules!=modules.size())
+        {
+            throw std::runtime_error("加载的模型模块模块数量和当前网络不匹配");
+        }
+
+        for(auto &module:modules)
+        {
+            module->load(file);
+        }
+        file.close();
+    }
     // 新增：设置最大迭代次数
     void set_max_iter(int max_iter) { max_iter_ = max_iter; }
 
